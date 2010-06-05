@@ -1,4 +1,3 @@
-# SolrFlare
 class SolrFlare
   SOLRFLARE_ROOT= RAILS_ROOT
   
@@ -125,8 +124,8 @@ class SolrFlare
   
   def initialize(*args)
     super(*args)
-    self.config = SolrFlareConfig.read_config("#{SOLRFLARE_ROOT}/config/solrflare.yml")
-    self.solr = RSolr.connect :url=>"#{config[:solr_uri]}/#{config[:core]}"
+    self.config = SolrFlare::SolrFlareConfig.new("#{SOLRFLARE_ROOT}/config/solrflare")
+    self.solr = RSolr.connect :url=>config.full_solr_url
   end
   
   def indexes
@@ -141,3 +140,10 @@ class SolrFlare
     return_array.compact
   end
 end
+
+require "solr_flare/solr_flare_config"
+require "solr_flare/active_record_extentions"
+require "solr_flare/column"
+require "solr_flare/index"
+require "solr_flare/result"
+require "solr_flare/encryption"
