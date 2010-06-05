@@ -2,10 +2,14 @@ require 'test_helper'
 require 'tmpdir'
 require 'yaml'
 class SolrFlareConfigTest < ActiveSupport::TestCase
+  def setup
+    @default_solr_url = 'http://0.0.0.0:8983/solr'
+  end
+  
   # Replace this with your real tests.
   test "passing in a config base that doesnt exist should return a config with the defaults only" do
     config = SolrFlare::SolrFlareConfig.new("/tmp/this_doesnt_exist#{SolrFlare::Encryption.create_token}")
-    assert_equal(config.solr_url,'http://0.0.0.0:8983/solr')
+    assert_equal(config.solr_url,@default_solr_url)
   end
   
   test "asking for a config item that doesnt exist should raise an error" do
@@ -21,7 +25,7 @@ class SolrFlareConfigTest < ActiveSupport::TestCase
   test "passing in a config base that does exist but no files should give the defaults only" do
     Dir.tmpdir do |dir|
       config = SolrFlare::SolrFlareConfig.new(dir)
-      assert_equal(config.solr_url,'http://0.0.0.0:8983/solr')
+      assert_equal(config.solr_url,@default_solr_url)
       assert_raise(NoMethodError){config.this_config_item_doesnt_exist}
     end
   end
@@ -35,7 +39,7 @@ class SolrFlareConfigTest < ActiveSupport::TestCase
       file.flush
       config = SolrFlare::SolrFlareConfig.new(dir)
       file.close
-      assert_equal(config.solr_url,'http://0.0.0.0:8983/solr')
+      assert_equal(config.solr_url,@default_solr_url)
       assert_equal(config.core,core_value)
     end
   end
@@ -55,7 +59,7 @@ class SolrFlareConfigTest < ActiveSupport::TestCase
       config = SolrFlare::SolrFlareConfig.new(dir)
       file1.close
       file2.close
-      assert_equal(config.solr_url,'http://0.0.0.0:8983/solr')
+      assert_equal(config.solr_url, @default_solr_url)
       assert_equal(config.core,core_value2)
     end
   end
@@ -69,7 +73,7 @@ class SolrFlareConfigTest < ActiveSupport::TestCase
       file.flush
       config = SolrFlare::SolrFlareConfig.new(dir)
       file.close
-      assert_equal(config.solr_full_url,"http://0.0.0.0:8983/solr/#{core_value}")
+      assert_equal(config.solr_full_url, @default_solr_url)
       assert_equal(config.core,core_value)
     end
   end

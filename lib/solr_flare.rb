@@ -124,7 +124,7 @@ class SolrFlare
   
   def initialize(*args)
     super(*args)
-    self.config = SolrFlare::SolrFlareConfig.new("#{SOLRFLARE_ROOT}/config/solrflare")
+    self.config = SolrFlare::SolrFlareConfig.new("#{SOLRFLARE_ROOT}/config/solr_flare")
     self.solr = RSolr.connect :url=>config.full_solr_url
   end
   
