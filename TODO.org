@@ -1,0 +1,3 @@
+1. Profile. 
+2. Ensure that multiple threads are being used properly in the backgroundrb tasks
+3. Write tests for the system

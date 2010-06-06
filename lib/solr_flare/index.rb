@@ -69,7 +69,7 @@ class SolrFlare::Index
     #NOTE: Must be done after all the models have been loaded
     #then check if the classes exist
     dependencies.each do |class_string, reverse_chain|
-      if (class_instance = SolrFlare.get_instance.get_model_instance(class_string)) && instance.is_a?(class_instance)
+      if (class_instance = SolrFlare.get_model_instance(class_string)) && instance.is_a?(class_instance)
         return reverse_chain
       end
     end

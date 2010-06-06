@@ -3,9 +3,8 @@ require 'erb'
 class SolrFlare::SolrFlareConfig
   attr_accessor :config
   def initialize(config_path)
-    self.config=YAML.load(ERB.new(IO.read(File.dirname(__FILE__) + "/../../config/default.yml")).result)
-    self.config||={:solr_url => 'http://0.0.0.0:8983/solr'}
-    ['solrflare.yml', "#{RAILS_ENV}.yml"].each do |file|
+    self.config=YAML.load(ERB.new(IO.read(File.dirname(__FILE__) + "/../../config/default.yml")).result) || {}
+    ['solr_flare.yml', "#{RAILS_ENV}.yml"].each do |file|
       config_file_path = "#{config_path}/#{file}"
       begin
         self.config.merge!(YAML.load(ERB.new(IO.read(config_file_path)).result)) if File.exists?(config_file_path)

@@ -32,7 +32,7 @@ class SolrFlareConfigTest < ActiveSupport::TestCase
   
   test "passing in a config base that does exist and solrflare file should give contents of flare file" do
     Dir.tmpdir do |dir|
-      file_name = 'solrflare.yml'
+      file_name = 'solr_flare.yml'
       core_value = 'development'
       file = Tmpfile.new(file_name,dir)
       file.write(YAML.dump(:core => core_value))
@@ -46,7 +46,7 @@ class SolrFlareConfigTest < ActiveSupport::TestCase
   
   test "environment file should override the solrflare file" do
     Dir.tmpdir do |dir|
-      file_name1 = 'solrflare.yml'
+      file_name1 = 'solr_flare.yml'
       core_value1 = 'development'
       file1 = Tmpfile.new(file_name1,dir)
       file1.write(YAML.dump(:core => core_value1))
@@ -66,7 +66,7 @@ class SolrFlareConfigTest < ActiveSupport::TestCase
   
   test "full solr url with a core is the same as solr url" do
     Dir.tmpdir do |dir|
-      file_name = 'solrflare.yml'
+      file_name = 'solr_flare.yml'
       core_value = 'development'
       file = Tmpfile.new(file_name,dir)
       file.write(YAML.dump(:core => core_value))
