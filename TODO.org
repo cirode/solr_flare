@@ -1,3 +1,6 @@
 1. Profile. 
 2. Ensure that multiple threads are being used properly in the backgroundrb tasks
 3. Write tests for the system
+4. make the setup take in user input and ask about overwriting if necissary
+5. Look at the backgroundrb tables and make sure they dont get filled too much
+6. Work out a way to automatically retry any failed tasks

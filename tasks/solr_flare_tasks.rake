@@ -17,5 +17,19 @@ namespace :solr_flare do
         File.open(config_dest, 'w') { |f| f.write(file.read) }
       end
     end
+    
+    worker_dir = "#{RAILS_ROOT}/lib/workers"
+    unless File.exists?(worker_dir)
+      puts "Creating Worker Directory"
+      Dir.mkdir(worker_dir)
+    end
+    
+    worker_dest = "#{worker_dir}/solr_flare_worker.rb"
+    unless File.exists?(worker_dest)
+      puts "Copying solr_flare_worker.rb config file to #{config_dest}"
+      File.open("#{File.dirname(__FILE__)}/../workers/solr_flare_worker.rb", 'r') do |file|
+        File.open(worker_dest, 'w') { |f| f.write(file.read) }
+      end
+    end
   end
 end
