@@ -4,6 +4,7 @@
 # end
 
 namespace :solr_flare do
+  desc "Run this task to set up the plugin, copies files into the right locations"
   task :setup do
     config_dir = "#{RAILS_ROOT}/config/solr_flare"
     unless File.exists?(config_dir)
@@ -30,6 +31,21 @@ namespace :solr_flare do
       File.open("#{File.dirname(__FILE__)}/../workers/solr_flare_worker.rb", 'r') do |file|
         File.open(worker_dest, 'w') { |f| f.write(file.read) }
       end
+    end
+  end
+  
+  desc "Remove SolrFlare from your rails app"
+  task :remove do
+    config_dir = "#{RAILS_ROOT}/config/solr_flare"
+    if File.exists?(config_dir)
+      puts "Removing Config Directory"
+      FileUtils.remove_dir(config_dir, true)
+    end
+    worker_dir = "#{RAILS_ROOT}/lib/workers"
+    worker_dest = "#{worker_dir}/solr_flare_worker.rb"
+    if File.exists?(worker_dest)
+      puts "Removing #{worker_dest}"
+      FileUtils.rm(worker_dest)
     end
   end
 end
