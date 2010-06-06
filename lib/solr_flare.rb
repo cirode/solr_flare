@@ -66,7 +66,7 @@ class SolrFlare
   #
   def self.reindex_all(classes=nil, priority=3, ignore_connected=true)
     this_proc = proc do |this_class|
-      this_class.find_in_batches do |batch|
+      this_class.find_in_batches(:select => 'id') do |batch|
         batch.each do |entry|
           puts "Reindexing #{entry.class.to_s}::#{entry.id}"
           reindex_instance(entry,priority)
