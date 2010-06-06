@@ -53,11 +53,11 @@ class SolrFlare
       options[:q] +=" model_name: #{model_name}"
       options.delete(:model_name)
     end
-    options[:rows] ||= '10'
+    options[:rows] ||= "10"
     options[:start] ||= '0'
     puts "q= #{options[:q].inspect}"
     response = self.solr.select(options)
-    return self::Result.new(response)
+    return self::Result.new(response,options[:rows].to_i)
   end
   
   ##

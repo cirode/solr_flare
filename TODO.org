@@ -4,3 +4,4 @@
 4. make the setup take in user input and ask about overwriting if necissary
 5. Look at the backgroundrb tables and make sure they dont get filled too much
 6. Work out a way to automatically retry any failed tasks
+6. Make it work with polymorphic models

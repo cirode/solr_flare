@@ -20,7 +20,6 @@ module SolrFlare::ActiveRecordExtentions
   
   module InstanceMethods
     def after_initialize
-      puts 'inited'
       unless self.class.have_defined_solr_methods?
         self.class.have_defined_solr_methods(true)
         id = SolrFlare::Encryption.create_token
