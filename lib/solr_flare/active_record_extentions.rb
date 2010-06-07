@@ -21,6 +21,7 @@ module SolrFlare::ActiveRecordExtentions
   module InstanceMethods
     def after_initialize
       unless self.class.have_defined_solr_methods?
+        puts 'Initializing'
         self.class.have_defined_solr_methods(true)
         id = SolrFlare::Encryption.create_token
         solr_index_container = SolrFlare

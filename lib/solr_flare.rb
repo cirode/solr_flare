@@ -85,17 +85,20 @@ class SolrFlare
   end
   
   def self.reindex_instance(instance, priority=5)
-    MiddleMan.worker(:solr_flare_worker).enq_reindex_document(:args => {:id => instance.id, :model_name => instance.class.to_s}, :priority=> priority, :job_key => build_document_id(instance))
+    #need to prevent the job queue instance from being added otherwise it becomes an infinite loop
+    MiddleMan.worker(:solr_flare_worker).enq_reindex_document(:args => {:id => instance.id, :model_name => instance.class.to_s}, :priority=> priority, :job_key => build_document_id(instance)) unless instance.is_a? BdrbJobQueue
   end
   
   def self.action_indexing(id, model_name)
     instance = get_model_instance(model_name).find(id)
     unless (document_instances = map_instance_to_document_instances(instance)).empty?
       document_instances.each do |doc_instance|
-        build_documents(id, model_name).each do |document|
-          solr.update(solr_flare.solr.message.add(document, :commitWithin => 10))
+        build_documents(doc_instance).each do |document|
+          solr.update(solr.message.add(document, :commitWithin => 10))
         end
       end
+    else
+      solr.delete_by_id(build_document_id(instance))
     end
   end
   
