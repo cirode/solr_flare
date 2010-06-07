@@ -1,13 +1,116 @@
 SolrFlare
 =========
 
-Introduction goes here.
+PRE-ALPHA VERSION!!
 
+Solr is an apache project to provide a web-service accessible port of the Lucene full-text indexing service.
+Unlike some other full text indexing plugins, SolrFlare specifically does not take care of Solr configuration for you, instead allowing the developer to alter Solr in almost any way they choose, including multicore setups.
+
+It also defers the index updating via the backgroundrb plugin so that UI delays do not occur even in the case of large many to one joins on the indexed data.
+
+
+
+==Dependencies==
+SolrFlare depends on the following gems/plugins:
+* backgroundrb
+* Nokogiri
+* RSolr
+
+Please ensure that the latest version of each is installed before installing this project.
+
+It also depends on an external Solr instance. An example schema.xml is provided in the plugins/example directory. Please see comments in the schema file for more details
+
+==Installation==
+Using rails' inbuilt plugin installation system:
+
+>> script/plugin install git@github.com:cirode/solr_flare.git
+
+After this has installed please run:
+
+>> rake solr_flare:setup
+
+This will copy various configuration files into you main Rails application. These are listed below:
+
+* config/solr_flare/solr_flare.yml
+* lib/workers/solr_flare_worker.rb
 
 Example
 =======
 
-Example goes here.
+With the plugin installed, first edit the config yaml file (solr_flare.yml) to point to your solr instance. A core name may be provided if you use multicore mode, otherwise leave it commented out. When setting up your Solr instance please refer to the three needed fields specified in the example schema.xml file given (id, instance_id and model_name)
+
+Once the configuration item has been setup adding an index can be achieved as below:
+
+class SomeModel < ActiveRecord::Base
+  define_index do |index|
+		index.column :name_t, :field_chain => [:name]
+		index.column :text_t, :field_chain => [:text]
+		index.column :dependent_text_t, :field_chain => [:dependent_model, :text]
+		
+		index.dependency 'DependentModel', :reverse_chain => [:some_model]
+		
+		index.where do |instance|
+			(instance.id %2 ==0) ? true : false
+		end
+  end
+end
+
+Define index explained:
+Indexes are configured in the model that is considered the "Primary model", this is the model that will be returned when you conduct a SolrFlare search. More below
+
+index.column sets up a column definition. The first parameter is the name of the field in your schema.xml (In the example above I am using a dynamic field), the field_chain array is used to map an instance of the primary model to the piece of data. For instance, a some_model instance has a name method that holds the data for the name column. It also has a text field on a joining model (DependentModel) accessed by  calling the :dependent_model method on the SomeModel instance and then the :text method on the DependentModel instance given.
+
+index.dependency sets up a dependent model. Any alterations to instances of these models will trigger a reindexing of the related primary model or models. Which primary model/s is given by the :reverse_chain parameter. This follows the same rules as filter_chain above but acts on a dependent model instance instead of the primary. 
+
+The index.where is called for each primary instance to be indexed. If you only want a subset of the primary models to be indexed, please include a where clause. The provided block should return true if the instance is to be indexed, otherwise it returns false. returning false will remove the instance from the index.
+
+Backroundrb: 
+
+Please refer to backgroundrb's setup instruction on how to setup and run this plugin. However an instance must be running with database persistance in order for the indexing to work.
+
+Searching:
+Once you have defined an index and saved a few instances, search can be accomplished using the following API.
+
+SolrFlare.search :q => 'Some Search'
+
+This method uses the same API as the underlying RSolr .select method with the following exceptions
+
+:model_name is a SolrFlare only option that specifies which primary models to search on. It can be a string or Array of strings. Not supplying this will default to searching all indexes
+
+:fl is overridden for internal purposes
+:wt is overridden for internal purposes
+
+The return value of search is an Array of ActiveRecord instances. SolrFlare accomplishes this by loading the instances that the index search specifies. 
 
 
-Copyright (c) 2010 [name of plugin creator], released under the MIT license
+==FAQ==
+===What about Many to One Joins, or one to Many Joins?===
+The *_chain arrays take this into account. Thus the end result of a chain may be more than one item. If this occurs, all primary instances will be re-indexed (if the result of a reverse_chain) and all items will be added to the index (if the result of a forward_chain). In this last instance, columns that will have more than one piece of data returned must be specified in the schema.xml as being multiValued
+
+===Does it cope with Rails's polymorphism?===
+Not at the moment. Although is is something I am working on
+
+===Can I prevent the autoloading from occuring in search?===
+Not at the moment. Although I am working on that
+
+===Is highlighting available?===
+Not at the moment. Although I am working on that
+
+===How efficient is this?===
+This depends on your use case. It is true that in order to get one lot of data out to be indexed a potential for lots of database hits occurs. Some plugins get around this by crafting one sql query that returns all the data. However this is only possible by concatenating multivalued fields together before adding to the index. This in turn prevents the relevancy functions from working correctly. 
+
+The approach of one method per field accommodates for this and the possibility of mixing data stored elsewhere (ie: flat file, etc) with your SQL indexed data at the expense of multi-database hits. ActiveRecords related_model caching can help in some instances here, however if this proves troublesome for you, I would recommend writing optimised sql in a function to get the data out.
+
+===Why Does this plugin exist?===
+When going through the different options for adding a full text index to my rails app I found a few options, most of which are no longer maintained. Also, most plugins do not offer any support or limited support for dependent models. If you are interested in further information please contact me via email.
+
+==TODO==
+1. Highlighting 
+2. Polymorphism
+3. More Testing
+4. Autoload prevention
+5. Look at the backgroundrb tables and make sure they dont get filled too much
+6. Work out a way to automatically retry any failed tasks
+
+
+Copyright (c) 2010 Chris Rode, released under the MIT license

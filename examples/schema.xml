@@ -224,9 +224,13 @@
         unknown fields indexed and/or stored by default --> 
    <!--dynamicField name="*" type="ignored" multiValued="true" /-->
   <!-- general -->
+
+	<!--NOTE: The first three fields here are needed by the SolrFlare plugin-->
   <field name="id"      type="string"   indexed="true"  stored="true"  multiValued="false" required="true"/>
   <field name="model_name" type="string"   indexed="true"  stored="true"  multiValued="false" required="true"/>
   <field name="instance_id" type="tint"   indexed="true"  stored="true"  multiValued="false" required="true"/>
+
+
   <field name="text" type="text"   indexed="true"  stored="false"  multiValued="true" required="false"/>
 
  </fields>

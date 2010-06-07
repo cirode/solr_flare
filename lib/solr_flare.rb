@@ -55,7 +55,6 @@ class SolrFlare
     end
     options[:rows] ||= "10"
     options[:start] ||= '0'
-    puts "q= #{options[:q].inspect}"
     response = self.solr.select(options)
     return self::Result.new(response,options[:rows].to_i)
   end
